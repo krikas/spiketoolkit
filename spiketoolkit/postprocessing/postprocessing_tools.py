@@ -125,7 +125,7 @@ def get_unit_waveforms(recording, sorting, unit_ids=None, channel_ids=None, retu
     if 'waveforms' in sorting.get_shared_unit_spike_feature_names() and not recompute_info:
         for unit_id in unit_ids:
             waveforms = sorting.get_unit_spike_features(unit_id, 'waveforms')
-            waveform_list.append(waveforms)
+            
             if len(waveforms) < len(sorting.get_unit_spike_train(unit_id)):
                 indexes = sorting.get_unit_spike_features(unit_id, 'waveforms_idxs')
             else:
@@ -133,7 +133,10 @@ def get_unit_waveforms(recording, sorting, unit_ids=None, channel_ids=None, retu
             if 'waveforms_channel_idxs' in sorting.get_shared_unit_property_names():
                 channel_idxs = sorting.get_unit_property(unit_id, 'waveforms_channel_idxs')
             else:
-                channel_idxs = np.arange(recording.get_num_channels())
+                all_channel_ids = recording.get_channel_ids()
+                channel_idxs = np.array([all_channel_ids.index(ch) for ch in channel_ids])
+                waveforms = waveforms[:, channel_idxs]
+            waveform_list.append(waveforms)
             spike_index_list.append(indexes)
             channel_index_list.append(channel_idxs)
     else:
